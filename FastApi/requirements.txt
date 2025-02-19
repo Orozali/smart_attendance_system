@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+opencv-python
+streamlit
+numpy
+pandas
+scikit-learn
+sqlalchemy
+psycopg2
+python-dotenv
+alembic
+python-multipart
+insightface
+onnxruntime
+python-jose
+passlib
