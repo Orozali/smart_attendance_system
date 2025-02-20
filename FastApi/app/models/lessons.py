@@ -9,11 +9,7 @@ class Lesson(Base):
     name = Column(String, index=True)
     code = Column(String, index=True)
 
-   # Foreign key to reference the teacher
     teacher_id = Column(Integer, ForeignKey("teacher.id"), nullable=True)
-
-    # Many-to-One relationship (Lesson → Teacher)
     teacher = relationship("Teacher", back_populates="lessons")
-
-    # Many-to-Many relationship with Student
     students = relationship("Student", secondary=student_lesson_association, back_populates="lessons")
+    timetables = relationship("Timetable", back_populates="lesson", cascade="all, delete-orphan")

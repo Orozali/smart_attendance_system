@@ -5,7 +5,7 @@ from app.core.database import get_db
 
 from app.services.userService import login, saveStudent, refreshToken
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/auth", tags=["Users"])
 
 @router.post("/register", response_model=schemas.UserResponse)
 async def upload_embeddings(background_tasks: BackgroundTasks,

@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.core.jwt_config import get_current_user
 
-from app.services.adminService import saveTeacher, saveLesson, getAllTeachers, getTeacherById, getAllLessons
+from app.services.adminService import saveTeacher, saveLesson, getAllTeachers, getTeacherById, getAllLessons, saveLesson2Teacher, get_lessons_of_teacher
 from app.schemas import teacher, lesson, user
 
 router = APIRouter(prefix='/admin', tags=["Admin"])
@@ -16,7 +17,7 @@ async def getTeachers(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
-    
+
 @router.get("/get-teacher/{id}")
 async def getById(id: int, db: Session = Depends(get_db)):
     return await getTeacherById(id, db)
@@ -43,6 +44,11 @@ async def getLessons(db: Session = Depends(get_db)):
     return await getAllLessons(db)
 
 
-@router.post("/add-lesson2teacher")
-async def addLesson2Teacher():
-    pass
+@router.post("/add-lesson2teacher/{id}", response_model=user.MessageResponse)
+async def addLesson2Teacher(id: int, request: lesson.AddLesson2Teacher, db: Session = Depends(get_db)):
+    return await saveLesson2Teacher(id, request, db)
+
+
+@router.get("/get-lessons-of-teacher/{teacher_id}")
+async def getLessonsOfTeacher(teacher_id: int, db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    return await get_lessons_of_teacher(teacher_id, db, current_user)

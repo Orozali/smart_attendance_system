@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 // src/pages/LoginPage.jsx
 export default function LoginPage() {
-  const [student_id, setStudent_id] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const [showPass, setShowPass] = useState(false);
@@ -21,7 +21,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     const newErrors = {};
-    if (!student_id.trim()) newErrors.student_id = "Введите ID";
+    if (!username.trim()) newErrors.username = "Введите ID";
     if (!password.trim()) newErrors.password = "Введите пароль";
 
     if (Object.keys(newErrors).length > 0) {
@@ -33,8 +33,8 @@ export default function LoginPage() {
     setErrors({});
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/users/login",
-        { student_id: student_id, password: password },
+        "http://127.0.0.1:8000/auth/login",
+        { username: username, password: password },
         {
           headers: { "Content-Type": "application/json" },
         }
@@ -80,12 +80,12 @@ export default function LoginPage() {
             type="text"
             className="w-full p-2 mt-2 border border-gray-300 rounded-md"
             placeholder="Enter your student ID"
-            value={student_id}
-            onChange={(e) => setStudent_id(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             disabled={loading}
           />
-          {errors.student_id && (
-            <p className="text-red-500 text-sm mt-1">{errors.student_id}</p>
+          {errors.username && (
+            <p className="text-red-500 text-sm mt-1">{errors.username}</p>
           )}
         </div>
 

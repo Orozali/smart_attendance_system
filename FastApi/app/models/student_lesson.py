@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, Table
 from app.core.database import Base
 
-# Many-to-Many association table
 student_lesson_association = Table(
     "student_lesson",
     Base.metadata,

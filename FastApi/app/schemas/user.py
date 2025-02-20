@@ -8,7 +8,7 @@ class StudentCreate(BaseModel):
     student_id: str
 
 class Login(BaseModel):
-    student_id: str
+    username: str
     password: str
 
 class UserResponse(BaseModel):

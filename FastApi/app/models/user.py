@@ -10,8 +10,5 @@ class User(Base):
     password = Column(String)
     role = Column(String)
 
-    # One-to-One relationship with Student
     student = relationship("Student", back_populates="user", uselist=False)  # uselist=False ensures one-to-one
-    
-    # One-to-One relationship with Teacher
     teacher = relationship("Teacher", back_populates="user", uselist=False)

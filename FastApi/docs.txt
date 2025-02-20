@@ -9,7 +9,7 @@ uvicorn app.main:app --reload
 uvicorn app.main:app --reload --log-level debug
 
 alembic init alembic
-alembic revision --autogenerate -m "Updated Lesson table"
+alembic revision --autogenerate -m "Added_timetable"
 alembic upgrade head
 
 

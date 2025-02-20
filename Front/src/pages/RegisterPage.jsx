@@ -119,7 +119,7 @@ export default function RegisterPage() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/users/register",
+        "http://127.0.0.1:8000/auth/register",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },

@@ -24,6 +24,7 @@ from app.models.student import Student
 from app.models.lessons import Lesson
 from app.models.teacher import Teacher
 from app.models.user import User
+from app.models.timetable import Timetable
 from app.models.student_lesson import student_lesson_association
 target_metadata = Base.metadata
 

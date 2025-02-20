@@ -52,14 +52,14 @@ async def saveStudent(background_tasks, db, files, name, surname, email, passwor
 
 
 async def login(db, request):
-    db_user = db.query(user.User).filter(user.User.username == request.student_id).first()
+    db_user = db.query(user.User).filter(user.User.username == request.username).first()
     if not db_user:
         raise HTTPException(status_code=400, detail="Incorrect username or password!")
     check = verify_password(request.password, db_user.password)
     if not check:
         raise HTTPException(status_code=400, detail="Incorrect username or password!")
-    access_token = jwt_config.create_access_token(data={"sub": db_user.username})
-    refresh_token = jwt_config.create_refresh_token(data={"sub": db_user.username})
+    access_token = jwt_config.create_access_token(data={"sub": str(db_user.id)})
+    refresh_token = jwt_config.create_refresh_token(data={"sub": str(db_user.id)})
 
 
     return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
@@ -68,12 +68,12 @@ async def login(db, request):
 async def refreshToken(refresh_token):
     try:
         payload = jwt_config.jwt.decode(refresh_token.refresh_token, jwt_config.SECRET_KEY, algorithms=[jwt_config.ALGORITHM])
-        student_id: str = payload.get("sub")
-        if student_id is None:
+        user_id: str = payload.get("sub")
+        if user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
         
         access_token_expires = timedelta(minutes=jwt_config.ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = jwt_config.create_access_token(data={"sub": student_id}, expires_delta=access_token_expires)
+        access_token = jwt_config.create_access_token(data={"sub": str(user_id)}, expires_delta=access_token_expires)
         return {"access_token": access_token, "token_type": "bearer"}
 
     except JWTError:
