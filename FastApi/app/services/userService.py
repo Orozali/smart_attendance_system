@@ -1,17 +1,22 @@
+import base64
 from datetime import timedelta
 from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from jose import JWTError
-
 from app.core import jwt_config
 
-from app.models import user
-from app.models import student
-from app.models import teacher
-from app.models import lessons
+from app.models.user import User
+from app.models.student import Student
+from app.models.teacher import Teacher
+from app.models.lessons import Lesson
 
 from app.core.security import verify_password, hash_password
 from app.core.insightface import process_images
+
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
+
 
 import logging
 
@@ -19,10 +24,12 @@ logging.basicConfig(level=logging.DEBUG)  # You can use DEBUG, INFO, WARNING, ER
 logger = logging.getLogger(__name__)
 
 
-async def saveStudent(background_tasks, db, files, name, surname, email, password, student_id):
+async def saveStudent(background_tasks, db: AsyncSession, files, name, surname, email, password, student_id):
     logger.debug("Starting saveStudent function")
-    db_user_email = db.query(student.Student).filter(student.Student.email == email).first()
-    db_user_student_id = db.query(student.Student).filter(student.Student.student_id == student_id).first()
+    db_user_email_result = await db.execute(select(Student).where(Student.email == email))
+    db_user_email = db_user_email_result.scalar_one_or_none()
+    db_user_student_id_result = await db.execute(select(Student).where(Student.student_id == student_id))
+    db_user_student_id = db_user_student_id_result.scalar_one_or_none()
     if db_user_email:  
         logger.error(f"User already registered: {email}")
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -30,13 +37,13 @@ async def saveStudent(background_tasks, db, files, name, surname, email, passwor
         logger.error(f"User already registered: {student_id}")
         raise HTTPException(status_code=400, detail="Student ID already registered")
     
-    new_user = user.User(username = student_id, password=hash_password(password), role = "STUDENT")
-    new_student = student.Student(name = name, surname = surname, email = email, student_id = student_id, user = new_user)
+    new_user = User(username = student_id, password=hash_password(password), role = "STUDENT")
+    new_student = Student(name = name, surname = surname, email = email, student_id = student_id, user = new_user)
     db.add(new_user)
     db.add(new_student)
-    db.commit()
-    db.refresh(new_user)
-    db.refresh(new_student)
+    await db.commit()
+    await db.refresh(new_user)
+    await db.refresh(new_student)
 
     file_contents = []
     for file in files:
@@ -51,8 +58,9 @@ async def saveStudent(background_tasks, db, files, name, surname, email, passwor
 
 
 
-async def login(db, request):
-    db_user = db.query(user.User).filter(user.User.username == request.username).first()
+async def login(db: AsyncSession, request):
+    db_result = await db.execute(select(User).where(User.username == request.username))
+    db_user = db_result.scalar_one_or_none()
     if not db_user:
         raise HTTPException(status_code=400, detail="Incorrect username or password!")
     check = verify_password(request.password, db_user.password)
@@ -60,9 +68,9 @@ async def login(db, request):
         raise HTTPException(status_code=400, detail="Incorrect username or password!")
     access_token = jwt_config.create_access_token(data={"sub": str(db_user.id)})
     refresh_token = jwt_config.create_refresh_token(data={"sub": str(db_user.id)})
+    role = db_user.role
 
-
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+    return {"access_token": access_token, "refresh_token": refresh_token, "role": role}
 
 
 async def refreshToken(refresh_token):
@@ -79,3 +87,81 @@ async def refreshToken(refresh_token):
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
 
+
+
+async def profile(db: AsyncSession, current_user: User):
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    image_data = None
+    if current_user.role == "STUDENT":
+        result = await db.execute(
+            select(Student).where(Student.user_id == current_user.id))
+        student = result.scalars().first()
+        if not student:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student profile not found")
+        
+        if student.image:
+            image_data = "data:image/png;base64," + student.image
+        else:
+            image_data = None
+        return {
+            "id": student.id,
+            "name": student.name,
+            "surname": student.surname,
+            "email": student.email,
+            "student_id": student.student_id,
+            "image": image_data
+        }
+
+    elif current_user.role == "TEACHER":
+        result = await db.execute(
+            select(Teacher).where(Teacher.user_id == current_user.id))
+        teacher = result.scalars().first()
+        if not teacher:
+            return {"error": "Teacher profile not found"}
+        if teacher.image:
+            image_data = "data:image/png;base64," + teacher.image
+        else:
+            image_data = None
+        return {
+            "id": teacher.id,
+            "name": teacher.name,
+            "surname": teacher.surname,
+            "email": teacher.email,
+            "image": image_data
+        }
+
+    return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role")
+
+
+
+async def save_avatar(file, db: AsyncSession, current_user: User):
+    file_bytes = await file.read()  # Read file as bytes
+    encoded_image = base64.b64encode(file_bytes).decode('utf-8')
+
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+    if current_user.role == "STUDENT":
+        db_student = await db.execute(
+            select(Student).where(Student.user_id == current_user.id)
+        )
+        db_student = db_student.scalar_one()
+        if not db_student:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
+        db_student.image = encoded_image
+        await db.commit()
+        await db.refresh(db_student)
+
+    elif current_user.role == "TEACHER":
+        db_teacher = await db.execute(
+            select(Teacher).where(Teacher.user_id == current_user.id)
+        )
+        db_teacher = db_teacher.scalar_one()
+        if not db_teacher:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Teacher not found")
+        db_teacher.image = encoded_image
+        await db.commit()
+        await db.refresh(db_teacher)
+
+    return {"message": "Image successfully saved!", "status": 200}

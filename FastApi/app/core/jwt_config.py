@@ -3,8 +3,10 @@ from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session
-from app.core.config import settings
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.user import User
 from app.core.database import get_db
 
@@ -36,24 +38,43 @@ def create_refresh_token(data: dict, expires_delta: timedelta = timedelta(days=R
     return encoded_jwt
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")  # Token URL
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", scheme_name="Bearer")  # Token URL
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     """Extract user from JWT token."""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-
-        user_id: int = payload.get("sub")
+        user_id = payload.get("sub")
 
         if user_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    except JWTError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
-    
-    user = db.query(User).filter(User.id == user_id).first()
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token: User ID is missing",
+            )
+
+        user_id = int(user_id)  # Ensure user_id is treated as integer
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+        )
+    except jwt.JWTError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token is invalid: {str(e)}",
+        )
+
+    # Query to get the user from the database
+    user_result = await db.execute(select(User).where(User.id == user_id))
+    user = user_result.scalar_one_or_none()
+
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found"
+        )
+
     return user
+
 
 
 def verify_token(token: str):

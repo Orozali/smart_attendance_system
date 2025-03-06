@@ -11,7 +11,11 @@ class Student(Base):
     surname = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     student_id = Column(String, unique=True, index=True)
+    image = Column(String, nullable=True)
 
     lessons = relationship("Lesson", secondary=student_lesson_association, back_populates="students")
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)  # Ensure user_id is unique
     user = relationship("User", back_populates="student", uselist=False)  # uselist=False ensures one-to-one
+
+    def __str__(self):
+        return self.student_id+': '+self.name+' '+self.surname

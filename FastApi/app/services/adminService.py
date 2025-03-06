@@ -2,11 +2,16 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 import logging
 
-from app.models import user
-from app.models import student
-from app.models import teacher
-from app.models import lessons
-from app.models import timetable
+from sqlalchemy.future import select
+
+from app.models.user import User
+from app.models.student import Student
+from app.models.teacher import Teacher
+from app.models.lessons import Lesson
+from app.models.timetable import Timetable
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 from app.core.security import hash_password, verify_password
 
@@ -20,55 +25,66 @@ def check_current_user(current_user):
     return current_user
 
 
-async def saveTeacher(request, db):
-    db_teacher = db.query(teacher.Teacher).filter(teacher.Teacher.email == request.email).first()
+async def saveTeacher(request, db: AsyncSession):
+    result = await db.execute(
+        select(Teacher).where(Teacher.email == request.email)
+    )
+    db_teacher = result.scalar_one_or_none()
     if db_teacher:
         logger.error(f"User already registered: {request.email}")
         raise HTTPException(status_code=400, detail="Email already registered")
-    new_user = user.User(username = request.email, password = hash_password(request.password), role = "TEACHER")
-    new_teacher = teacher.Teacher(name = request.name, surname = request.surname, email = request.email, user = new_user)
+    new_user = User(username = request.email, password = hash_password(request.password), role = "TEACHER")
+    new_teacher = Teacher(name = request.name, surname = request.surname, email = request.email, user = new_user)
     db.add(new_user)
     db.add(new_teacher)
-    db.commit()
-    db.refresh(new_user)
-    db.refresh(new_teacher)
+    await db.commit()
+    await db.refresh(new_user)
+    await db.refresh(new_teacher)
 
     response = {"message": "A new teacher successfully saved!", "status": 200}
     logger.debug(f"Teacher with the name {request.name} successfully registered!")
     return JSONResponse(status_code=200, content=response)
 
 
-async def saveLesson(request, db):
-    new_lesson = lessons.Lesson(name = request.name, code = request.code)
+async def saveLesson(request, db: AsyncSession):
+    new_lesson = Lesson(name = request.name, code = request.code)
     db.add(new_lesson)
-    db.commit()
-    db.refresh(new_lesson)
+    await db.commit()
+    await db.refresh(new_lesson)
     response = {"message": "A new lesson successfully saved!", "status": 200}
     return JSONResponse(status_code=200, content=response)
 
 
-async def getAllTeachers(db):
-    return db.query(teacher.Teacher).all()
+async def getAllTeachers(db: AsyncSession):
+    result = await db.execute(select(Teacher))
+    return result.scalars().all()
 
 
-async def getTeacherById(id, db):
-    db_teacher = db.query(teacher.Teacher).filter(teacher.Teacher.id == id).first()
+async def getTeacherById(id, db: AsyncSession):
+    result = await db.execute(
+        select(Teacher).where(Teacher.id == id)
+        )
+    db_teacher = result.scalar_one_or_none()
     if not db_teacher:
         raise HTTPException(status_code=404, detail="Teacher not found")
     return db_teacher
 
 
-async def getAllLessons(db):
-    db_lessons = db.query(lessons.Lesson).all()
-    return db_lessons
+async def getAllLessons(db:AsyncSession):
+    db_lessons = await db.execute(select(Lesson))
+    return db_lessons.scalars().all()
 
 
-async def saveLesson2Teacher(id, request, db):
-    db_teacher = db.query(teacher.Teacher).filter(teacher.Teacher.id == id).first()
+async def saveLesson2Teacher(id, request, db: AsyncSession):
+    result = await db.execute(
+        select(Teacher).where(Teacher.id == id))
+    db_teacher = result.scalar_one_or_none()
     if not db_teacher:
         raise HTTPException(status_code=404, detail="Teacher not found")
     
-    db_lessons = db.query(lessons.Lesson).filter(lessons.Lesson.id.in_(request.lessonsId)).all()
+    result_lesson = await db.execute(
+        select(Lesson).where(Lesson.id.in_(request.lessonsId)))
+    db_lessons = result_lesson.scalars().all()
     if not db_lessons:
         raise HTTPException(status_code=404, detail="No valid lessons found")
     
@@ -77,15 +93,15 @@ async def saveLesson2Teacher(id, request, db):
         db.add(lesson)
 
     try:
-        db.commit()
+        await db.commit()
     except Exception as e:
-        db.rollback()
+        await db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     response = {"message": "Lessons assigned successfully!", "status": 200}
     return JSONResponse(status_code=200, content=response)
 
 
-async def get_lessons_of_teacher(teacher_id, db, current_user):
+async def get_lessons_of_teacher(teacher_id: int, db: AsyncSession, current_user):
     check_current_user(current_user=current_user)
-    db_lessons = db.query(lessons.Lesson).filter(lessons.Lesson.teacher_id == teacher_id).all()
-    return db_lessons
+    db_result = await db.execute(select(Lesson).where(Lesson.teacher_id == teacher_id))
+    return db_result.scalars().all()

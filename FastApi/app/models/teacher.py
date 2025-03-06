@@ -8,7 +8,11 @@ class Teacher(Base):
     name = Column(String, index=True)
     surname = Column(String, index=True)
     email = Column(String, unique=True, index=True)
+    image = Column(String, nullable=True)
 
     lessons = relationship("Lesson", back_populates="teacher", cascade="all, delete-orphan")
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)  # Ensure user_id is unique
-    user = relationship("User", back_populates="teacher", uselist=False)  # uselist=False ensures one-to-one
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    user = relationship("User", back_populates="teacher", uselist=False, cascade="all, delete", single_parent=True)  # uselist=False ensures one-to-one
+
+    def __str__(self):
+        return f"{self.name} {self.surname}"

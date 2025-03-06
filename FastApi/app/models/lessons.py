@@ -13,3 +13,6 @@ class Lesson(Base):
     teacher = relationship("Teacher", back_populates="lessons")
     students = relationship("Student", secondary=student_lesson_association, back_populates="lessons")
     timetables = relationship("Timetable", back_populates="lesson", cascade="all, delete-orphan")
+
+    def __str__(self):
+        return self.code+': '+self.name
