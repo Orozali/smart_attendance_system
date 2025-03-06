@@ -8,11 +8,11 @@ import {
   NotebookPen,
 } from "lucide-react";
 
-export default function Navbar() {
+export default function Navbar_teacher() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen h-auto max-h-full">
+    <div className="flex">
       {/* Sidebar */}
       <aside
         className={`bg-gray-900 text-white ${
@@ -32,7 +32,7 @@ export default function Navbar() {
         {/* Sidebar Links */}
         <nav className={`mt-12 space-y-2 ${isSidebarOpen ? "" : "hidden"}`}>
           <Link
-            to="/"
+            to="/teacher-dashboard"
             className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
           >
             <img
@@ -53,44 +53,12 @@ export default function Navbar() {
           </Link>
           <p className="text-sm text-gray-400 font-mono">Course Info</p>
           <Link
-            to="/my-lessons"
+            to="/teacher-lessons"
             className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
           >
             <Notebook className="w-4 h-4" />
-            <span>Courses taken</span>
+            <span>My Lessons</span>
           </Link>
-          <Link
-            to="/all-lessons"
-            className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
-          >
-            <BookCheck className="w-4 h-4" />
-            <span> All subjects</span>
-          </Link>
-          <Link
-            to="/choose-lesson"
-            className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
-          >
-            <NotebookPen className="w-4 h-4 text-[#0dcaf0]" />
-            <span>Ekle-sil</span>
-          </Link>
-
-          <p className="text-sm text-gray-400 font-mono">Other services</p>
-          <a
-            href="https://eders-bahar2025.manas.edu.kg/my/courses.php"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
-          >
-            E-course
-          </a>
-          <a
-            href="https://elib.manas.edu.kg/index.php"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
-          >
-            E-kitepter
-          </a>
         </nav>
       </aside>
     </div>

@@ -1,29 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
-import Navbar from "../components/NavBar/Navbar";
-import { Link } from "react-router-dom";
-import { Outlet } from "react-router-dom";
+import NavbarTeacher from "../components/NavBar/Navbar_teacher";
+import { Outlet, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
-import Navbar_teacher from "../components/NavBar/Navbar_teacher";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-export default function Layout({ children }) {
+export default function TeacherLayout() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [role, setRole] = useState("");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     const token = Cookies.get("access_token");
     setIsAuthenticated(!!token);
 
     const userRole = Cookies.get("role");
-    if (userRole) {
-      setRole(userRole);
+    if (!token || userRole !== "TEACHER") {
+      navigate("/login");
     }
-
-    // if (userRole === "TEACHER") {
-    //   navigate("/teacher-dashboard");
-    // }
 
     // Close dropdown when clicking outside
     function handleClickOutside(event) {
@@ -40,18 +34,12 @@ export default function Layout({ children }) {
 
   const handleLogout = () => {
     Cookies.remove("access_token");
-    setIsAuthenticated(false);
     window.location.href = "/login";
   };
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar Navigation */}
-      {role === "STUDENT" ? (
-        <Navbar />
-      ) : role === "TEACHER" ? (
-        <Navbar_teacher />
-      ) : null}
+      <NavbarTeacher />
 
       <div className="flex-1 flex flex-col bg-gray-100">
         {/* Top Navbar */}
@@ -98,9 +86,7 @@ export default function Layout({ children }) {
 
         {/* Main Content Area */}
         <div className="flex-1 flex justify-center">
-          <div className="flex-1 flex flex-col bg-gray-100 mt-0.5">
-            <Outlet />
-          </div>
+          <Outlet />
         </div>
       </div>
     </div>

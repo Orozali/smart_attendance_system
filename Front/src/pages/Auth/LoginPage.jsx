@@ -39,11 +39,19 @@ export default function LoginPage() {
           headers: { "Content-Type": "application/json" },
         }
       );
-
-      saveTokenToCookies(response.data.access_token);
-
-      setLoading(false);
-      navigate("/");
+      const role = response.data.role;
+      saveTokenToCookies(
+        response.data.access_token,
+        response.data.refresh_token,
+        response.data.role
+      );
+      if (role == "TEACHER") {
+        setLoading(false);
+        navigate("/teacher-dashboard");
+      } else {
+        setLoading(false);
+        navigate("/");
+      }
     } catch (error) {
       setLoading(false);
       alert(
@@ -52,7 +60,7 @@ export default function LoginPage() {
     }
   };
 
-  const saveTokenToCookies = (access_token, refresh_token) => {
+  const saveTokenToCookies = (access_token, refresh_token, role) => {
     Cookies.set("access_token", access_token, {
       expires: 7,
       secure: true,
@@ -64,6 +72,8 @@ export default function LoginPage() {
       expires: 7,
       sameSite: "Strict",
     });
+
+    Cookies.set("role", role);
   };
 
   return (

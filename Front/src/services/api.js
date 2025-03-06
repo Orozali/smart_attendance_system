@@ -9,9 +9,12 @@ const api = axios.create({
 
 // Function to get a new access token using the refresh token
 const refreshToken = async () => {
-  const response = await axios.post("/api/refresh-token", {
-    refresh_token: Cookies.get("refresh_token"),
-  });
+  const response = await axios.post(
+    "http://localhost:8000/auth/refresh-token",
+    {
+      refresh_token: Cookies.get("refresh_token"),
+    }
+  );
   return response.data.access_token;
 };
 
@@ -19,6 +22,7 @@ const refreshToken = async () => {
 api.interceptors.response.use(
   (response) => response, // If the response is successful, return it
   async (error) => {
+    console.log("error:", error);
     if (error.response && error.response.status === 401) {
       // If the error is Unauthorized (token expired), try to refresh the token
       try {
