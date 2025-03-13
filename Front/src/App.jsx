@@ -10,6 +10,8 @@ import ChooseLesson from "./pages/Student/ChooseLesson";
 import Lessons from "./pages/Teacher/Lessons";
 import Dashboard from "./pages/Teacher/Dashboard";
 import TeacherLayout from "./pages/TeacherLayout";
+import LessonInfo from "./pages/Teacher/LessonInfo";
+import FaceRecognition from "./pages/FaceRecognition";
 
 function App() {
   return (
@@ -18,6 +20,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/face-recognition" element={<FaceRecognition />} />
 
         {/* Student Layout */}
         <Route element={<ProtectedRoute />}>
@@ -35,6 +38,7 @@ function App() {
             {/* <Route path="/teacher-home" element={<TeacherHome />} /> */}
             <Route path="/teacher-dashboard" element={<Dashboard />} />
             <Route path="/teacher-lessons" element={<Lessons />} />
+            <Route path="/lesson/:lessonId" element={<LessonInfo />} />
           </Route>
         </Route>
       </Routes>
