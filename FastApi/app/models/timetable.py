@@ -20,7 +20,7 @@ class Timetable(Base):
     day = Column(Enum(DaysEnum), nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
-    cabinet_num = Column(String, nullabel=True)
+    cabinet_num = Column(String, nullable=True)
     lesson = relationship("Lesson", back_populates="timetables")
 
     def __str__(self):

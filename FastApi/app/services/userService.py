@@ -11,7 +11,7 @@ from app.models.teacher import Teacher
 from app.models.lessons import Lesson
 
 from app.core.security import verify_password, hash_password
-from app.core.insightface import process_images
+from app.core.insightface import process_images_while_saving
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -52,7 +52,7 @@ async def saveStudent(background_tasks, db: AsyncSession, files, name, surname, 
      # Send response immediately
     response = {"message": "Registration is successful!", "status": 200}
 
-    background_tasks.add_task(process_images, file_contents, student_id)
+    background_tasks.add_task(process_images_while_saving, file_contents, student_id)
     logger.debug(f"Student {student_id} registered successfully")
     return JSONResponse(status_code=200, content=response)
 

@@ -72,3 +72,17 @@ async def get_my_lessons(db: AsyncSession, current_user: User):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Student not found")
     
     return db_student.lessons
+
+async def get_student_details(student_id:int, db: AsyncSession, bbox):
+    result = await db.execute(
+        select(Student.name, Student.surname, Student.student_id)
+        .where(Student.student_id == student_id)
+    )
+    student = result.fetchone()  # ✅ Fetch first row properly
+
+    if student:
+        # `fetchone()` returns a tuple, so unpack it properly
+        name, surname, student_id = student
+        return {"name": name, "surname": surname, "student_id": student_id, "bbox": bbox}
+
+    return None

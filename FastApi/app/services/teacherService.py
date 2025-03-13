@@ -31,11 +31,16 @@ async def get_all_lessons_by_teacher_id(current_user, db:AsyncSession):
 
 async def get_lesson_by_id(id, db: AsyncSession, current_user):
     check_current_user(current_user)
-    db_lesson = await db.execute(select(Lesson).where(Lesson.id == id))
+    db_lesson = await db.execute(select(Lesson).options(selectinload(Lesson.students)).where(Lesson.id == id))
     db_lesson = db_lesson.scalar_one()
     if not db_lesson:
         raise HTTPException(status_code=404, detail="Lesson not found!")
-    return db_lesson.students
+    countOfStudent = len(db_lesson.students)
+    return {
+        "code": db_lesson.code,
+        "name": db_lesson.name,
+        "countOfStudent": countOfStudent
+    }
     
 
 async def get_main(db: AsyncSession, current_user: User):
@@ -50,7 +55,6 @@ async def get_main(db: AsyncSession, current_user: User):
     
     lesson_count = len(db_teacher.lessons)
 
-    # Count the number of students across all lessons
     student_count_result = await db.execute(
         select(func.count(func.distinct(Student.id)))
         .join(student_lesson_association, student_lesson_association.c.student_id == Student.id)
@@ -69,3 +73,20 @@ async def get_main(db: AsyncSession, current_user: User):
             "departmentCount": 1
         }
     )
+
+async def get_students_of_teacher(lessonId: int, db: AsyncSession, current_user: User):
+    db_user = check_current_user(current_user)
+    db_teacher = await db.execute(select(Teacher).where(Teacher.user_id == db_user.id))
+    db_teacher = db_teacher.scalar_one()
+    if not db_teacher:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Teacher not found!")
+    
+    result = await db.execute(
+        select(Student)
+        .join(Student.lessons)
+        .where(Lesson.id == lessonId, Lesson.teacher_id == db_teacher.id)
+        .distinct()
+    )
+
+    students = result.scalars().unique().all()
+    return students

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import JSONResponse
 import traceback
@@ -9,15 +10,31 @@ from app.api.routes import admin
 from app.api.routes import student
 from app.api.routes import teacher
 from app.api.routes import lesson
+from app.cron import capture
 
 from app.core.database import  engine
 from app.admin.admin_auth import authentication_backend
 from app.admin.admin import register_admin
+from contextlib import asynccontextmanager
+from app.cron.cron import scheduler
+
+from fastapi import WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse
 
 from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel, OAuth2 as OAuth2Model
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Starting scheduler...")
+    if not scheduler.running:
+        scheduler.start()
+    yield  # Keep the app running
+    print("Shutting down scheduler...")
+    scheduler.shutdown()
 
-app = FastAPI(title="FastAPI PostgreSQL Example")
+
+app = FastAPI(title="FastAPI PostgreSQL Example", lifespan=lifespan)
+
 
 admin_panel = register_admin(app, engine, authentication_backend)
 app.mount("/static", StaticFiles(directory="app/admin/static"), name="static")
@@ -27,21 +44,27 @@ app.include_router(admin.router)
 app.include_router(student.router)
 app.include_router(teacher.router)
 app.include_router(lesson.router)
+app.include_router(capture.ws_router)
+
+@app.on_event("startup")
+def startup_event():
+    if not scheduler.running:
+        scheduler.start()
+    print("Scheduler started in FastAPI!")
 
 
-origins = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
+app.add_middleware(
+    TrustedHostMiddleware, allowed_hosts=["*"]
+)
 
 @app.exception_handler(Exception)
 async def exception_handler(request: Request, exc: Exception):
