@@ -7,26 +7,24 @@ const FaceRecognition = () => {
   const [faces, setFaces] = useState([]);
 
   useEffect(() => {
-    // Start WebRTC Camera
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
 
-      // Open WebSocket Connection
-      ws.current = new WebSocket("ws://localhost:8001/ws"); // Connect to FastAPI WebSocket server
+      ws.current = new WebSocket("ws://localhost:8000/ws");
 
       ws.current.onmessage = (event) => {
-        const data = JSON.parse(event.data); // Parse JSON response
+        const data = JSON.parse(event.data);
         if (data.students) {
           const detectedFaces = data.students.map((student) => {
             const [x, y, w, h] = student.bbox;
             return {
               x,
               y,
-              w: w - x, // Convert width from right-left
-              h: h - y, // Convert height from bottom-top
-              name: `${student.name} ${student.surname}`, // Combine full name
+              w: w - x,
+              h: h - y, 
+              name: `${student.name} ${student.surname}`,
               student_id: student.student_id,
             };
           });
@@ -36,7 +34,6 @@ const FaceRecognition = () => {
 
       ws.current.onerror = (error) => console.error("WebSocket Error:", error);
 
-      // Send frames periodically (every 100ms)
       const sendFrame = () => {
         if (ws.current.readyState === WebSocket.OPEN && videoRef.current) {
           const canvas = document.createElement("canvas");
@@ -52,8 +49,9 @@ const FaceRecognition = () => {
             }
           }, "image/jpeg");
         }
-        // setTimeout(sendFrame, 600);
-        requestAnimationFrame(sendFrame);
+        setTimeout(sendFrame, 100);
+        // requestAnimationFrame(sendFrame);
+
       };
 
       sendFrame();
@@ -64,32 +62,37 @@ const FaceRecognition = () => {
     };
   }, []);
 
-  // Draw face rectangles on canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
-
+  
     const drawBoxes = () => {
       if (!canvas || !ctx || !videoRef.current) return;
-
+  
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "red";
-      ctx.lineWidth = 2;
-      ctx.font = "18px Arial";
-      ctx.fillStyle = "red";
-
+  
       faces.forEach(({ x, y, w, h, name }) => {
+        const isUnknown = name.trim().toLowerCase() === "unknown unknown";
+        const displayName = isUnknown ? "Unknown" : name;
+  
+        ctx.strokeStyle = isUnknown ? "red" : "green";
+        ctx.lineWidth = 2;
+        ctx.font = "18px Arial";
+        ctx.fillStyle = isUnknown ? "red" : "green";
+  
         ctx.strokeRect(x, y, w, h);
-        ctx.fillText(name, x + 5, y - 5);
+  
+        ctx.fillText(displayName, x + 5, y - 5);
       });
-
+  
       requestAnimationFrame(drawBoxes);
     };
-
+  
     drawBoxes();
   }, [faces]);
+  
 
   return (
     <div style={{ position: "relative" }}>

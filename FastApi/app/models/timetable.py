@@ -23,5 +23,7 @@ class Timetable(Base):
     cabinet_num = Column(String, nullable=True)
     lesson = relationship("Lesson", back_populates="timetables")
 
+    temporary_attendances = relationship("TemporaryAttendance", back_populates="timetable")
+
     def __str__(self):
             return f"{self.day}"

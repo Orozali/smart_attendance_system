@@ -16,6 +16,6 @@ class Student(Base):
     lessons = relationship("Lesson", secondary=student_lesson_association, back_populates="students")
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)  # Ensure user_id is unique
     user = relationship("User", back_populates="student", uselist=False)  # uselist=False ensures one-to-one
-
+    temporary_attendances = relationship("TemporaryAttendance", back_populates="student")
     def __str__(self):
         return self.student_id+': '+self.name+' '+self.surname

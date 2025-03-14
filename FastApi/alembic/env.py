@@ -26,6 +26,7 @@ from app.models.teacher import Teacher
 from app.models.user import User
 from app.models.timetable import Timetable
 from app.models.student_lesson import student_lesson_association
+from app.models.temporary_db import TemporaryAttendance
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

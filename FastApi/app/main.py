@@ -10,7 +10,7 @@ from app.api.routes import admin
 from app.api.routes import student
 from app.api.routes import teacher
 from app.api.routes import lesson
-from app.cron import capture
+from app.cron import router
 
 from app.core.database import  engine
 from app.admin.admin_auth import authentication_backend
@@ -18,17 +18,13 @@ from app.admin.admin import register_admin
 from contextlib import asynccontextmanager
 from app.cron.cron import scheduler
 
-from fastapi import WebSocket, WebSocketDisconnect
-from fastapi.responses import HTMLResponse
-
-from fastapi.openapi.models import OAuthFlows as OAuthFlowsModel, OAuth2 as OAuth2Model
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting scheduler...")
     if not scheduler.running:
         scheduler.start()
-    yield  # Keep the app running
+    yield
     print("Shutting down scheduler...")
     scheduler.shutdown()
 
@@ -44,7 +40,7 @@ app.include_router(admin.router)
 app.include_router(student.router)
 app.include_router(teacher.router)
 app.include_router(lesson.router)
-app.include_router(capture.ws_router)
+app.include_router(router.ws_router)
 
 @app.on_event("startup")
 def startup_event():

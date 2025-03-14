@@ -11,7 +11,7 @@ from app.models.teacher import Teacher
 from app.models.lessons import Lesson
 
 from app.core.security import verify_password, hash_password
-from app.core.insightface import process_images_while_saving
+from app.cron.insightface import process_images_while_saving
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select

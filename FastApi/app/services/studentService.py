@@ -7,6 +7,10 @@ from app.models.teacher import Teacher
 from app.models.lessons import Lesson
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+import logging
+
+logging.basicConfig(level=logging.DEBUG)  # You can use DEBUG, INFO, WARNING, ERROR, CRITICAL
+logger = logging.getLogger(__name__)
 
 
 def check_current_user(current_user):
@@ -73,16 +77,14 @@ async def get_my_lessons(db: AsyncSession, current_user: User):
     
     return db_student.lessons
 
-async def get_student_details(student_id:int, db: AsyncSession, bbox):
+async def get_student_details(student_id, db: AsyncSession, bbox) -> Student:
     result = await db.execute(
-        select(Student.name, Student.surname, Student.student_id)
+        select(Student.id, Student.name, Student.surname, Student.student_id)
         .where(Student.student_id == student_id)
     )
-    student = result.fetchone()  # ✅ Fetch first row properly
+    student = result.fetchone()
 
     if student:
-        # `fetchone()` returns a tuple, so unpack it properly
-        name, surname, student_id = student
-        return {"name": name, "surname": surname, "student_id": student_id, "bbox": bbox}
-
+        return {"id": student.id, "name": student.name, "surname": student.surname, "student_id": student.student_id, "bbox": bbox}
+ 
     return None
