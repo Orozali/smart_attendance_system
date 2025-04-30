@@ -9,13 +9,14 @@ from app.models.student import Student
 from app.models.teacher import Teacher
 from app.models.lessons import Lesson
 from app.models.timetable import Timetable
+from app.models.timetable_times import Timetable_times
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 from app.core.security import hash_password, verify_password
 
-logging.basicConfig(level=logging.DEBUG)  # You can use DEBUG, INFO, WARNING, ERROR, CRITICAL
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 

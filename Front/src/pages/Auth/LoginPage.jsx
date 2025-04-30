@@ -61,15 +61,16 @@ export default function LoginPage() {
   };
 
   const saveTokenToCookies = (access_token, refresh_token, role) => {
+    const inFiveHours = new Date(new Date().getTime() + 5 * 60 * 60 * 1000);
     Cookies.set("access_token", access_token, {
-      expires: 7,
+      expires: inFiveHours,
       secure: true,
       sameSite: "Strict",
     });
 
     Cookies.set("refresh_token", refresh_token, {
       secure: true,
-      expires: 7,
+      expires: inFiveHours,
       sameSite: "Strict",
     });
 

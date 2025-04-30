@@ -13,9 +13,10 @@ class Student(Base):
     student_id = Column(String, unique=True, index=True)
     image = Column(String, nullable=True)
 
+    attendance = relationship("Attendance", back_populates="student", cascade="all, delete-orphan")
     lessons = relationship("Lesson", secondary=student_lesson_association, back_populates="students")
-    user_id = Column(Integer, ForeignKey("users.id"), unique=True)  # Ensure user_id is unique
-    user = relationship("User", back_populates="student", uselist=False)  # uselist=False ensures one-to-one
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True)
+    user = relationship("User", back_populates="student", uselist=False)
     temporary_attendances = relationship("TemporaryAttendance", back_populates="student")
     def __str__(self):
         return self.student_id+': '+self.name+' '+self.surname

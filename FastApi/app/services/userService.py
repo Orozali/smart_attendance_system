@@ -11,16 +11,14 @@ from app.models.teacher import Teacher
 from app.models.lessons import Lesson
 
 from app.core.security import verify_password, hash_password
-from app.cron.insightface import process_images_while_saving
+from app.core.insightface import process_images_while_saving
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
-
 
 import logging
 
-logging.basicConfig(level=logging.DEBUG)  # You can use DEBUG, INFO, WARNING, ERROR, CRITICAL
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -47,15 +45,13 @@ async def saveStudent(background_tasks, db: AsyncSession, files, name, surname, 
 
     file_contents = []
     for file in files:
-        contents = await file.read()  # Read the file content
+        contents = await file.read()
         file_contents.append(contents)
-     # Send response immediately
     response = {"message": "Registration is successful!", "status": 200}
 
     background_tasks.add_task(process_images_while_saving, file_contents, student_id)
     logger.debug(f"Student {student_id} registered successfully")
     return JSONResponse(status_code=200, content=response)
-
 
 
 async def login(db: AsyncSession, request):
@@ -86,7 +82,6 @@ async def refreshToken(refresh_token):
 
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
-
 
 
 async def profile(db: AsyncSession, current_user: User):
@@ -134,9 +129,8 @@ async def profile(db: AsyncSession, current_user: User):
     return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid role")
 
 
-
 async def save_avatar(file, db: AsyncSession, current_user: User):
-    file_bytes = await file.read()  # Read file as bytes
+    file_bytes = await file.read()
     encoded_image = base64.b64encode(file_bytes).decode('utf-8')
 
     if not current_user:

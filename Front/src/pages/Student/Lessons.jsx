@@ -68,7 +68,18 @@ export default function StudentLessons() {
                   <td className="border border-gray-200 p-2 text-center">
                     {lesson.teacher.name + " " + lesson.teacher.surname}
                   </td>
-                  <td className="border border-gray-200 p-2">%%%%</td>
+                  <td
+                    className={`border border-gray-200 p-2 text-center ${
+                      lesson.attendance_percentage >= 25
+                        ? "bg-red-200"
+                        : lesson.attendance_percentage >= 18
+                        ? "bg-yellow-200"
+                        : ""
+                    }`}
+                  >
+                    {lesson.attendance_percentage}%
+                  </td>
+
                 </tr>
               ))}
             </tbody>

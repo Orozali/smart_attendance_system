@@ -67,7 +67,6 @@ export default function LessonInfo() {
           },
         }
       );
-      console.log(response.data);
       setStudents(response.data);
     } catch (err) {
       setStudentsError("Failed to load students. Please try again.");
@@ -90,23 +89,22 @@ export default function LessonInfo() {
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-xl font-semibold">Lesson Information</h1>
           <div className="flex space-x-2">
-            {/* <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition">
-              Жоктомо
-            </button> */}
-            <Link
-              to="/face-recognition"
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
-            >
-              <span> Жоктомо</span>
-            </Link>
-          </div>
-        </div>
-
-        {loading ? (
+          {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
-        ) : (
+        ) : lesson ? (
+          <Link
+            to={`/attendance/${lesson.id}`}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
+          >
+            <span>Жоктомо</span>
+          </Link>
+        ) : null}
+          </div>
+        </div>
+
+        {loading || error ? null :(
           <table className="w-full border border-gray-300">
             <thead className="bg-gray-100">
               <tr>

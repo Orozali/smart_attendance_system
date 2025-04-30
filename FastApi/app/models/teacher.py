@@ -12,7 +12,7 @@ class Teacher(Base):
 
     lessons = relationship("Lesson", back_populates="teacher", cascade="all, delete-orphan")
     user_id = Column(Integer, ForeignKey("users.id"), unique=True)
-    user = relationship("User", back_populates="teacher", uselist=False, cascade="all, delete", single_parent=True)  # uselist=False ensures one-to-one
+    user = relationship("User", back_populates="teacher", uselist=False, cascade="all, delete", single_parent=True)
 
     def __str__(self):
         return f"{self.name} {self.surname}"

@@ -129,7 +129,7 @@ export default function RegisterPage() {
       setLoading(false);
       showToast("Registration successful!", "success");
       setTimeout(() => {
-        navigate("/login");
+        navigate("/");
       }, 3000);
     } catch (error) {
       setLoading(false);
@@ -237,11 +237,11 @@ export default function RegisterPage() {
         <div className="flex flex-col items-center relative">
           <video
             ref={videoRef}
-            className="w-64 h-64 rounded-full border-4 border-gray-600"
+            className="w-85 h-85 rounded-full border-4 border-gray-600"
             autoPlay
           />
           <canvas ref={canvasRef} width="640" height="480" hidden />
-          <div className="absolute bottom-4 text-white text-lg font-semibold bg-black bg-opacity-50 p-2 rounded">
+          <div className="absolute bottom-1 text-white text-lg font-semibold bg-black bg-opacity-50 p-1 rounded">
             {feedbackMessage}
           </div>
         </div>

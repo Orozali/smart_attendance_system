@@ -13,6 +13,10 @@ class DaysEnum(enum.Enum):
     SATURDAY = "SATURDAY"
     SUNDAY = "SUNDAY"
 
+class Type(enum.Enum):
+    TEORIC = "TEORIC"
+    PRACTIC = "PRACTIC"
+
 class Timetable(Base):
     __tablename__ = "timetable"
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -21,9 +25,12 @@ class Timetable(Base):
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
     cabinet_num = Column(String, nullable=True)
+    type = Column(Enum(Type), nullable=True)
+
     lesson = relationship("Lesson", back_populates="timetables")
 
     temporary_attendances = relationship("TemporaryAttendance", back_populates="timetable")
+    timetable_times = relationship("Timetable_times", back_populates="timetable",  cascade="all, delete")
 
     def __str__(self):
-            return f"{self.day}"
+            return f"{self.id}"

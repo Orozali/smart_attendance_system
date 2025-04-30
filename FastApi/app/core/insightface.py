@@ -9,6 +9,7 @@ from app.models.student import Student
 from app.models.timetable import Timetable
 from app.models.lessons import Lesson
 from app.models.temporary_db import TemporaryAttendance
+from app.models.timetable_times import Timetable_times
 
 from datetime import datetime
 from sqlalchemy.future import select
@@ -35,7 +36,13 @@ face_app.prepare(ctx_id=0, det_size=(640,640), det_thresh=0.5)
 
 async def process_frame(image_data: str, db: AsyncSession):
     nparr = np.frombuffer(image_data, np.uint8)
+    logger.debug(f"Received image data size: {len(nparr)} bytes")
     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+    # cv2.imshow('Test image', frame)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    
     faces = face_app.get(frame)
 
     logger.debug(f"Students faces successfully received!: {len(faces)}")
@@ -55,20 +62,12 @@ async def process_frame(image_data: str, db: AsyncSession):
             student = await get_student_details(matched_student, db, bbox)
             if not student:
                 return {"error": "Student not found!"}
-            logger.debug(f"STUDENT: {student}")
             student_info.append(student)
-            logger.debug("Save to temporary db function is working")
             await save_to_db(student, db)
             # asyncio.create_task(await save_to_db(student, db))
-            logger.debug("Save to temporary db function is successfully finished")
-
-            # save_to_db(student, db)
         else:
             student_info.append({"id":"Unknown", "name": "Unknown", "surname": "Unknown", "student_id": "Unknown", "bbox": bbox})
 
-        # cv2.imshow('Test image', frame)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
     return {"students": student_info}
 
 
@@ -138,7 +137,6 @@ async def save_to_db(student_info: dict, db: AsyncSession):
     try:
         current_time = datetime.now().time()
         current_day = datetime.now().strftime("%A").upper()
-        logger.debug(f"------------Current time: {current_time} and Current day: {current_day}-----------------")
 
         stmt = select(Timetable).where(
             Timetable.day == current_day,
@@ -158,7 +156,6 @@ async def save_to_db(student_info: dict, db: AsyncSession):
 
         student_id = student_info.get("id")
         if student_id not in enrolled_students:
-            logger.warning(f"Student {student_id} is not in the current lesson.")
             return
 
         stmt = select(TemporaryAttendance).where(

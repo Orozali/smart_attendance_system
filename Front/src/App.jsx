@@ -12,6 +12,8 @@ import Dashboard from "./pages/Teacher/Dashboard";
 import TeacherLayout from "./pages/TeacherLayout";
 import LessonInfo from "./pages/Teacher/LessonInfo";
 import FaceRecognition from "./pages/FaceRecognition";
+import AttendancePage from "./pages/Teacher/AttendancePage";
+import AttendanceReport from "./pages/Teacher/AttendanceReport";
 
 function App() {
   return (
@@ -39,6 +41,8 @@ function App() {
             <Route path="/teacher-dashboard" element={<Dashboard />} />
             <Route path="/teacher-lessons" element={<Lessons />} />
             <Route path="/lesson/:lessonId" element={<LessonInfo />} />
+            <Route path="/attendance/:lessonId" element={<AttendancePage />} />
+            <Route path="/attendance/report" element={<AttendanceReport />} />
           </Route>
         </Route>
       </Routes>

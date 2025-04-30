@@ -9,7 +9,7 @@ uvicorn app.main:app --reload
 uvicorn app.main:app --reload --log-level debug
 
 alembic init alembic
-alembic revision --autogenerate -m "updated temporary db"
+alembic revision --autogenerate -m "updated attendance db"
 alembic upgrade head
 
 

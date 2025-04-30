@@ -1,29 +1,26 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
-from jose import JWTError, jwt
+from jose import jwt
 
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
 from app.core.database import get_db
-
-SECRET_KEY = "your_secret_key"  # Change this to a secure secret key
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
-REFRESH_TOKEN_EXPIRE_DAYS = 7
-
-
 import logging
 
-logging.basicConfig(level=logging.DEBUG)  # You can use DEBUG, INFO, WARNING, ERROR, CRITICAL
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+SECRET_KEY = "your_secret_key"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 5
+REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)):
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(hours=ACCESS_TOKEN_EXPIRE_MINUTES)):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
@@ -37,8 +34,7 @@ def create_refresh_token(data: dict, expires_delta: timedelta = timedelta(days=R
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", scheme_name="Bearer")  # Token URL
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login", scheme_name="Bearer")
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)):
     """Extract user from JWT token."""
@@ -52,7 +48,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
                 detail="Invalid token: User ID is missing",
             )
 
-        user_id = int(user_id)  # Ensure user_id is treated as integer
+        user_id = int(user_id)
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -64,7 +60,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
             detail=f"Token is invalid: {str(e)}",
         )
 
-    # Query to get the user from the database
     user_result = await db.execute(select(User).where(User.id == user_id))
     user = user_result.scalar_one_or_none()
 
@@ -74,7 +69,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         )
 
     return user
-
 
 
 def verify_token(token: str):

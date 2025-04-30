@@ -8,6 +8,7 @@ class Lesson(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, index=True)
     code = Column(String, index=True)
+    credi = Column(Integer, index=True)
 
     teacher_id = Column(Integer, ForeignKey("teacher.id"), nullable=True)
     teacher = relationship("Teacher", back_populates="lessons")

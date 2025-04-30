@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status, BackgroundTasks
-from sqlalchemy.orm import Session
 from app.schemas import user as schemas
 from app.core.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession

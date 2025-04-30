@@ -10,26 +10,13 @@ from app.api.routes import admin
 from app.api.routes import student
 from app.api.routes import teacher
 from app.api.routes import lesson
-from app.cron import router
+from app.api.routes import attendance
 
 from app.core.database import  engine
 from app.admin.admin_auth import authentication_backend
 from app.admin.admin import register_admin
-from contextlib import asynccontextmanager
-from app.cron.cron import scheduler
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("Starting scheduler...")
-    if not scheduler.running:
-        scheduler.start()
-    yield
-    print("Shutting down scheduler...")
-    scheduler.shutdown()
-
-
-app = FastAPI(title="FastAPI PostgreSQL Example", lifespan=lifespan)
+app = FastAPI(title="FastAPI PostgreSQL Example")
 
 
 admin_panel = register_admin(app, engine, authentication_backend)
@@ -40,15 +27,7 @@ app.include_router(admin.router)
 app.include_router(student.router)
 app.include_router(teacher.router)
 app.include_router(lesson.router)
-app.include_router(router.ws_router)
-
-@app.on_event("startup")
-def startup_event():
-    if not scheduler.running:
-        scheduler.start()
-    print("Scheduler started in FastAPI!")
-
-
+app.include_router(attendance.router)
 
 app.add_middleware(
     CORSMiddleware,

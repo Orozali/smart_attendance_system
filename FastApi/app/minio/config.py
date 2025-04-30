@@ -2,12 +2,11 @@ from minio import Minio
 import numpy as np
 import io
 
-# MinIO Client Configuration
 minio_client = Minio(
-    endpoint="localhost:9000",  # Change if hosted remotely
+    endpoint="localhost:9000",
     access_key="admin",
     secret_key="password",
-    secure=False  # Set to True if using HTTPS
+    secure=False
 )
 
 # Ensure the bucket exists

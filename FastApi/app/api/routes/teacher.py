@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from fastapi import APIRouter, Depends, Query
+from datetime import date
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.schemas.teacher import AttendancePayload
 from app.core.database import get_db
 from app.core.jwt_config import get_current_user
-from app.services.teacherService import get_all_lessons_by_teacher_id, get_lesson_by_id, get_main, get_students_of_teacher
+from app.services.teacherService import get_all_lessons_by_teacher_id, get_lesson_by_id, get_main, get_students_of_teacher, get_students_from_temp_db, save_attendance
 
 router = APIRouter(prefix="/teacher", tags=['Teacher'])
 
@@ -23,3 +26,15 @@ async def getLessonById(id: int, db: AsyncSession = Depends(get_db), current_use
 @router.get("/get-students/{lessonId}")
 async def getStudentsOfTeacher(lessonId: int, db: AsyncSession = Depends(get_db),  current_user = Depends(get_current_user)):
     return await get_students_of_teacher(lessonId, db, current_user)
+
+@router.get("/get-students-from-temporary-db/{lessonId}")
+async def getStudentsFromTempDb(lessonId: int, day: Optional[date] = Query(None), db: AsyncSession = Depends(get_db), current_user = Depends(get_current_user)):
+    return await get_students_from_temp_db(lessonId, day, db, current_user)
+
+@router.post("/attendance/save")
+async def save_attendance_route(
+    data: AttendancePayload,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    return await save_attendance(data.student_ids, data.timetable_id, data.manually_checked_ids, data.day, db, current_user)
