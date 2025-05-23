@@ -33,7 +33,8 @@ export default function LoginPage() {
     setErrors({});
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/auth/login",
+        // "http://127.0.0.1:8000/auth/login",
+        "https://40c8-178-217-174-2.ngrok-free.app/auth/login",
         { username: username, password: password },
         {
           headers: { "Content-Type": "application/json" },

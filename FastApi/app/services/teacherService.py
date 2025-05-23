@@ -108,6 +108,10 @@ async def get_students_from_temp_db(lessonId, day: date, db: AsyncSession, curre
     if not db_teacher:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Teacher not found!")
 
+    lesson = await db.execute(select(Lesson).where(Lesson.id == lessonId))
+    lesson = lesson.scalar_one_or_none()
+    if not lesson:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Lesson not found!")
     filters = [Lesson.id == lessonId]
     if day:
         day_name = day.strftime("%A").upper()
@@ -180,7 +184,10 @@ async def get_students_from_temp_db(lessonId, day: date, db: AsyncSession, curre
         for student in all_students
     ]
 
-    return student_list
+    return {
+        "lesson_info": lesson,
+        "students": student_list
+    }
 
 
 async def students_in_temp_db(db: AsyncSession, timetable_id):
@@ -197,6 +204,20 @@ async def students_in_temp_db(db: AsyncSession, timetable_id):
 async def save_attendance(studentsID: List[int], timetable_id: int, manually_checked_ids: List[int], day: date, db: AsyncSession, current_user):
     check_current_user(current_user)
     today = date.today()
+    day_name = day.strftime("%A").upper()
+
+    timetable_query = select(Timetable).where(Timetable.id == timetable_id, Timetable.day == day_name)
+    result = await db.execute(timetable_query)
+    timetable = result.scalar_one_or_none()
+
+    if not timetable:
+        # If today and no timetable, return error
+        if day == today:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="You can't save attendance for today. No timetable found.")
+        # If a past date and no timetable, return error
+        elif day < today:
+            raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=f"No timetable found for the selected date: {day}")
+
     if day and day < today:
         for student_id in manually_checked_ids:
             result = await db.execute(select(Student).where(Student.id == student_id))
@@ -250,3 +271,19 @@ async def save_attendance(studentsID: List[int], timetable_id: int, manually_che
     await db.commit()
 
     return {"message": "Attenance successfully saved!", "status": 200}
+
+
+async def get_lesson_today(lessonId: int, db: AsyncSession, current_user):
+    check_current_user(current_user)
+    today = datetime.today().strftime("%A").upper()
+    today_lesson = await db.execute(
+        select(Timetable)
+        .where(
+            Timetable.lesson_id == lessonId,
+            Timetable.day == today
+        )
+    )
+    today_lesson = today_lesson.scalar_one_or_none()
+    if not today_lesson:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No lesson today!")
+    return {"timetable_id": today_lesson.id}   

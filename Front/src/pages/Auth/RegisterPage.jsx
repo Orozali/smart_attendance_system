@@ -119,7 +119,8 @@ export default function RegisterPage() {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:8000/auth/register",
+        // "http://127.0.0.1:8000/auth/register",
+        "https://40c8-178-217-174-2.ngrok-free.app/auth/register",
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },

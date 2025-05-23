@@ -35,7 +35,13 @@ export default function ChooseLesson() {
         return;
       }
       try {
-        const response = await axios.get("http://localhost:8000/lesson/all");
+        const response = await axios.get("https://40c8-178-217-174-2.ngrok-free.app/lesson/all",
+          {
+            headers: {
+              "ngrok-skip-browser-warning": "69420"
+            },
+          }
+        );
         setLessons(response.data);
       } catch (err) {
         setError("Failed to load lessons. Please try again.");
@@ -68,10 +74,13 @@ export default function ChooseLesson() {
 
     try {
       const response = await api.post(
-        "http://localhost:8000/student/choose-lesson",
+        "https://40c8-178-217-174-2.ngrok-free.app/student/choose-lesson",
         selectedLessons,
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+             Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "69420"
+          },
         }
       );
       if (response.status === 200) {

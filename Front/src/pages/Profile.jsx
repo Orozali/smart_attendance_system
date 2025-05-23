@@ -18,8 +18,11 @@ export default function ProfilePage() {
         return;
       }
       try {
-        const response = await api.get("http://localhost:8000/auth/profile", {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await api.get("https://40c8-178-217-174-2.ngrok-free.app/auth/profile", {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "69420"
+          },
         });
 
         setProfile(response.data);

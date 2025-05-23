@@ -17,7 +17,7 @@ const Dashboard = () => {
       }
       try {
         const response = await api.get(
-          "http://localhost:8000/teacher/main-info",
+          "https://40c8-178-217-174-2.ngrok-free.app/teacher/main-info",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

@@ -60,7 +60,7 @@ export default function LessonInfo() {
         return;
       }
       const response = await api.get(
-        `http://localhost:8000/teacher/get-students/${parsedId}`,
+        `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students/${parsedId}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("access_token")}`,

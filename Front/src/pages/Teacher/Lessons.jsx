@@ -18,11 +18,12 @@ export default function StudentLessons() {
 
       try {
         const response = await api.get(
-          "http://localhost:8000/teacher/get-lessons",
+          "https://40c8-178-217-174-2.ngrok-free.app/teacher/get-lessons",
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
+              "ngrok-skip-browser-warning": "69420"
             },
           }
         );

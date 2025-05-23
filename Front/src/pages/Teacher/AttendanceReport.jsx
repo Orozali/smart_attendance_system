@@ -18,8 +18,8 @@ export default function ReportPage() {
       if (!token) return;
       try {
         const url = day
-        ? `http://localhost:8000/teacher/get-students-from-temporary-db/${lessonId}?day=${day}`
-        : `http://localhost:8000/teacher/get-students-from-temporary-db/${lessonId}`;
+        ? `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}?day=${day}`
+        : `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}`;
 
         console.log(url);
         

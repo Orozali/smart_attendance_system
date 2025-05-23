@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
@@ -8,6 +7,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 export default function AttendancePage() {
   const [students, setStudents] = useState([]);
+  const [lessonInfo, setLessonInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -41,15 +41,16 @@ export default function AttendancePage() {
     }
     try {
       const url = day
-        ? `http://localhost:8000/teacher/get-students-from-temporary-db/${lessonId}?day=${day.toISOString().split("T")[0]}`
-        : `http://localhost:8000/teacher/get-students-from-temporary-db/${lessonId}`;
+        ? `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}?day=${day.toISOString().split("T")[0]}`
+        : `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}`;
   
       const response = await api.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
   
-      setStudents(response.data);
-      setTimetableId(response.data[0]?.timetable_id);
+      setStudents(response.data.students);
+      setLessonInfo(response.data.lesson_info);
+      setTimetableId(response.data.students[0]?.timetable_id);
       
     } catch (err) {
       if (err.response?.data?.detail) {
@@ -71,9 +72,10 @@ export default function AttendancePage() {
     }
 
     try {
-      const res = await api.get(`http://localhost:8000/attendance?timetable_id=${timetableId}`, {
+      const res = await api.get(`https://40c8-178-217-174-2.ngrok-free.app/attendance?timetable_id=${timetableId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log(res) 
       setAttendanceDates(res.data);
     } catch (err) {
       console.error("Failed to fetch attendance dates:", err);
@@ -93,7 +95,8 @@ export default function AttendancePage() {
   }, [navigate, selectedDate]);
 
 
-  const handleDateClick = (dateStr) => {
+
+  const handleDateClick = (dateStr) => {    
     setSelectedDate(new Date(dateStr));
     setLoading(true);
   };
@@ -116,7 +119,7 @@ export default function AttendancePage() {
 
     try {
       const dateToUse = selectedDate ?? new Date();
-      await api.post("http://localhost:8000/teacher/attendance/save", {
+      await api.post("https://40c8-178-217-174-2.ngrok-free.app/teacher/attendance/save", {
         student_ids: selectedIds,
         manually_checked_ids: manuallyCheckedIds,
         timetable_id: timetableId,
@@ -128,7 +131,7 @@ export default function AttendancePage() {
       showToast("Attendance saved successfully!", "success");
       setTimeout(() => {
         window.location.reload();
-      }, 10000)
+      }, 2000)
     } catch (err) {
       console.error(err);
       showToast(
@@ -156,6 +159,10 @@ export default function AttendancePage() {
   return (
     <div className="w-full p-6 bg-gray-100">
       <ToastContainer />
+      <div>
+        <h2 className="text-gray-800">{lessonInfo?.code} {lessonInfo?.name}</h2>
+      </div>
+
       <div className="flex justify-between">
       <div className="flex justify-start gap-5 mb-4">
       {attendanceDates.map((dateStr, index) => (
