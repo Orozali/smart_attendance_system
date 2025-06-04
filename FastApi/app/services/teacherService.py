@@ -218,7 +218,7 @@ async def save_attendance(studentsID: List[int], timetable_id: int, manually_che
         elif day < today:
             raise HTTPException(status.HTTP_400_BAD_REQUEST, detail=f"No timetable found for the selected date: {day}")
 
-    if day and day < today:
+    if day:
         for student_id in manually_checked_ids:
             result = await db.execute(select(Student).where(Student.id == student_id))
             student = result.scalar_one_or_none()

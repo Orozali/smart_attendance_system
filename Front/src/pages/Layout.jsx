@@ -20,12 +20,6 @@ export default function Layout({ children }) {
     if (userRole) {
       setRole(userRole);
     }
-
-    // if (userRole === "TEACHER") {
-    //   navigate("/teacher-dashboard");
-    // }
-
-    // Close dropdown when clicking outside
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
@@ -46,7 +40,6 @@ export default function Layout({ children }) {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar Navigation */}
       {role === "STUDENT" ? (
         <Navbar />
       ) : role === "TEACHER" ? (
@@ -54,16 +47,14 @@ export default function Layout({ children }) {
       ) : null}
 
       <div className="flex-1 flex flex-col bg-gray-100">
-        {/* Top Navbar */}
         <nav className="bg-white shadow-md px-6 py-3 flex justify-between items-center rounded-lg w-full">
           <h1 className="text-lg font-semibold">Smart Attendance System</h1>
 
-          {/* Profile Dropdown */}
           {isAuthenticated && (
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent closing when clicking inside
+                  e.stopPropagation();
                   setIsDropdownOpen((prev) => !prev);
                 }}
                 className="text-gray-800 hover:text-gray-600 focus:outline-none px-4 py-2 border rounded-lg"
@@ -71,7 +62,6 @@ export default function Layout({ children }) {
                 My Profile ▼
               </button>
 
-              {/* Dropdown Menu */}
               <div
                 className={`absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 transition-all duration-300 z-50 ${
                   isDropdownOpen
@@ -96,7 +86,6 @@ export default function Layout({ children }) {
           )}
         </nav>
 
-        {/* Main Content Area */}
         <div className="flex-1 flex justify-center">
           <div className="flex-1 flex flex-col bg-gray-100 mt-0.5">
             <Outlet />

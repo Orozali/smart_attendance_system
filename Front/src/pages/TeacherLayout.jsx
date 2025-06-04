@@ -19,7 +19,6 @@ export default function TeacherLayout() {
       navigate("/login");
     }
 
-    // Close dropdown when clicking outside
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);

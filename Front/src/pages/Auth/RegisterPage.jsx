@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { BASE_URL } from "../../config";
+
 export default function RegisterPage() {
   const [capturing, setCapturing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -55,13 +57,13 @@ export default function RegisterPage() {
   const captureImages = async () => {
     let images = [];
     for (let i = 0; i < 100; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 100)); // Delay to simulate real-time capture
+      await new Promise((resolve) => setTimeout(resolve, 100));
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       images.push(canvas.toDataURL("image/jpeg"));
     }
-    setFormData((prev) => ({ ...prev, images })); // Preserve other form fields
+    setFormData((prev) => ({ ...prev, images }));
     setCapturing(false);
     videoRef.current.srcObject.getTracks().forEach((track) => track.stop());
   };
@@ -87,17 +89,14 @@ export default function RegisterPage() {
       newErrors.images = "Зарегистрируйте свое лицо";
     }
 
-    // If there are errors, stop submission and update state
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     } else {
-      setErrors({}); // Clear errors if form is valid
+      setErrors({});
     }
 
     setLoading(true);
-
-    // Prepare FormData
     const formDataToSend = new FormData();
     formDataToSend.append("name", formData.name);
     formDataToSend.append("surname", formData.surname);
@@ -105,7 +104,6 @@ export default function RegisterPage() {
     formDataToSend.append("password", formData.password);
     formDataToSend.append("student_id", formData.studentNumber);
 
-    // Convert each image to a Blob and append to FormData
     formData.images.forEach((image, index) => {
       const byteString = atob(image.split(",")[1]);
       const arrayBuffer = new ArrayBuffer(byteString.length);
@@ -119,8 +117,7 @@ export default function RegisterPage() {
 
     try {
       const response = await axios.post(
-        // "http://127.0.0.1:8000/auth/register",
-        "https://40c8-178-217-174-2.ngrok-free.app/auth/register",
+        `${BASE_URL}/auth/register`,
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -143,11 +140,7 @@ export default function RegisterPage() {
   };
 
   const detectFace = () => {
-    // You can integrate face detection logic here
     const video = videoRef.current;
-    // Simple face detection logic using canvas or libraries like face-api.js
-
-    // Example: Update face detection status (for now it's just a mock)
     if (video) {
       const rect = video.getBoundingClientRect();
       if (rect.width < 100 || rect.height < 100) {
@@ -176,7 +169,7 @@ export default function RegisterPage() {
           onSubmit={handleSubmit}
           className="w-full max-w-sm bg-white p-6 rounded-lg shadow-lg"
         >
-          {["name", "surname", "email", "studentNumber", "password"].map(
+          {["name", "surname", "email", "student №", "password"].map(
             (field, idx) => (
               <div className="mb-4" key={idx}>
                 <label className="block text-gray-700">

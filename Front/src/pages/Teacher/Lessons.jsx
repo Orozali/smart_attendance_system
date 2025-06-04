@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import api from "../../services/api";
+import { BASE_URL } from "../../config";
 
 export default function StudentLessons() {
   const [lessons, setLessons] = useState([]);
@@ -18,7 +19,7 @@ export default function StudentLessons() {
 
       try {
         const response = await api.get(
-          "https://40c8-178-217-174-2.ngrok-free.app/teacher/get-lessons",
+          `${BASE_URL}/teacher/get-lessons`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -54,8 +55,6 @@ export default function StudentLessons() {
                 <th className="border border-gray-200 p-2">#</th>
                 <th className="border border-gray-200 p-2">Code</th>
                 <th className="border border-gray-200 p-2">Name</th>
-                {/* <th className="border border-gray-200 p-2">Teacher</th>
-                <th className="border border-gray-200 p-2">Attendance</th> */}
               </tr>
             </thead>
             <tbody>
@@ -66,10 +65,6 @@ export default function StudentLessons() {
                   </td>
                   <td className="border border-gray-200 p-2">{lesson.code}</td>
                   <td className="border border-gray-200 p-2">{lesson.name}</td>
-                  {/* <td className="border border-gray-200 p-2 text-center">
-                    {lesson.teacher.name + " " + lesson.teacher.surname}
-                  </td>
-                  <td className="border border-gray-200 p-2">%%%%</td> */}
                 </tr>
               ))}
             </tbody>

@@ -4,6 +4,8 @@ import Cookies from "js-cookie";
 import api from "../../services/api";
 import { CircleChevronLeft } from "lucide-react";
 
+import { BASE_URL } from "../../config";
+
 export default function ReportPage() {
   const location = useLocation();
   const { lessonId, day } = location.state || {};
@@ -12,16 +14,12 @@ export default function ReportPage() {
 
   useEffect(() => {
     const token = Cookies.get("access_token");
-    console.log(day);
-
     const fetchReportData = async () => {
       if (!token) return;
       try {
         const url = day
-        ? `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}?day=${day}`
-        : `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}`;
-
-        console.log(url);
+        ? `${BASE_URL}/teacher/get-students-from-temporary-db/${lessonId}?day=${day}`
+        : `${BASE_URL}/teacher/get-students-from-temporary-db/${lessonId}`;
         
         const response = await api.get(
           url,
@@ -30,9 +28,8 @@ export default function ReportPage() {
           }
         );
         console.log(response.data)
-        const attendedStudents = response.data.filter(s => s.attended);
+        const attendedStudents = response.data.students.filter(s => s.attended);
   
-        // Only update if data actually changed (optional optimization)
         setStudents(prev => {
           const prevIds = prev.map(s => s.id).sort().join(",");
           const newIds = attendedStudents.map(s => s.id).sort().join(",");
@@ -47,12 +44,11 @@ export default function ReportPage() {
       }
     };
   
-    // Initial fetch
     if (lessonId) {
       fetchReportData();
-      const intervalId = setInterval(fetchReportData, 1000); // 1 second
+      const intervalId = setInterval(fetchReportData, 1000);
   
-      return () => clearInterval(intervalId); // cleanup on unmount
+      return () => clearInterval(intervalId);
     }
   }, [lessonId, day]);
   
@@ -62,7 +58,7 @@ export default function ReportPage() {
 
   return (
     <div className="absolute p-6">
-      <div className="absolute top-6 left-4"
+      <div className="absolute top-6 left-0"
         onClick={() => window.history.back()}
         >
         <CircleChevronLeft />
@@ -70,7 +66,7 @@ export default function ReportPage() {
       <h2 className="text-2xl font-bold text-center mb-6">Attendance Report</h2>
 
       {students.length === 0 ? (
-        <p className="text-center">No students attended.</p>
+        <p className="text-center">Report already done.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {students.map((student) => (

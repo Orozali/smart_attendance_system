@@ -6,7 +6,6 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Hero Section */}
       <div
         className="relative w-full h-[500px] flex items-center justify-center bg-cover bg-center"
         style={{ backgroundImage: "url('/attendance-bg.jpg')" }}
@@ -33,7 +32,6 @@ export default function HomePage() {
         </motion.div>
       </div>
 
-      {/* Feature Carousel */}
       <div className="max-w-4xl mx-auto mt-12">
         <Carousel
           autoPlay

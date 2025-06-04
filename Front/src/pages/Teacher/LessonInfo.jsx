@@ -4,6 +4,7 @@ import api from "../../services/api";
 import Cookies from "js-cookie";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BASE_URL } from "../../config";
 
 export default function LessonInfo() {
   const { lessonId } = useParams();
@@ -14,6 +15,10 @@ export default function LessonInfo() {
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [studentsError, setStudentsError] = useState(null);
   const [showStudents, setShowStudents] = useState(false);
+
+  useEffect(() => {
+    console.log("Lesson ID from params:2222", lessonId);
+  },[])
 
   useEffect(() => {
     const accessToken = Cookies.get("access_token");
@@ -31,7 +36,7 @@ export default function LessonInfo() {
     }
 
     api
-      .get(`http://localhost:8000/teacher/get-lesson/${parsedId}`, {
+      .get(`${BASE_URL}/teacher/get-lesson/${parsedId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -60,7 +65,7 @@ export default function LessonInfo() {
         return;
       }
       const response = await api.get(
-        `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students/${parsedId}`,
+        `${BASE_URL}/teacher/get-students/${parsedId}`,
         {
           headers: {
             Authorization: `Bearer ${Cookies.get("access_token")}`,
@@ -95,7 +100,7 @@ export default function LessonInfo() {
           <p className="text-center text-red-500">{error}</p>
         ) : lesson ? (
           <Link
-            to={`/attendance/${lesson.id}`}
+            to={`/attendance/${lessonId}`}
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
           >
             <span>Жоктомо</span>
@@ -111,7 +116,7 @@ export default function LessonInfo() {
                 <th className="border border-gray-300 p-2">#</th>
                 <th className="border border-gray-300 p-2">
                   Академиялык бирими
-                </th>
+                </th> 
                 <th className="border border-gray-300 p-2">Сабактын коду</th>
                 <th className="border border-gray-300 p-2">Семестр</th>
                 <th className="border border-gray-300 p-2">Студенттин саны</th>

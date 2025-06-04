@@ -13,13 +13,11 @@ export default function Navbar() {
 
   return (
     <div className="flex min-h-screen h-auto max-h-full">
-      {/* Sidebar */}
       <aside
         className={`bg-gray-900 text-white ${
           isSidebarOpen ? "w-64" : "w-20"
         } transition-all duration-300 p-4 flex flex-col h-full`}
       >
-        {/* Sidebar Toggle Button - Always Fixed at Top */}
         <div className="absolute top-4 left-4">
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -29,7 +27,6 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Sidebar Links */}
         <nav className={`mt-12 space-y-2 ${isSidebarOpen ? "" : "hidden"}`}>
           <Link
             to="/"

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import Cookies from "js-cookie";
+import { BASE_URL } from "../../config";
 
 const Dashboard = () => {
   const [data, setData] = useState(null);
@@ -17,7 +18,7 @@ const Dashboard = () => {
       }
       try {
         const response = await api.get(
-          "https://40c8-178-217-174-2.ngrok-free.app/teacher/main-info",
+          `${BASE_URL}/teacher/main-info`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -51,7 +52,6 @@ const Dashboard = () => {
       </h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-        {/* Students Count */}
         <div className="bg-blue-600 text-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-3xl font-bold">{data.studentCount}</h3>
           <p>Учурдагы семестрдa Сиз сабак берген студенттердин саны</p>
@@ -60,7 +60,6 @@ const Dashboard = () => {
           </a>
         </div>
 
-        {/* Lessons Count */}
         <div className="bg-green-600 text-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-3xl font-bold">{data.lessonCount}</h3>
           <p>Учурдагы семестрдa Сиз берген сабактардын саны</p>
@@ -69,7 +68,6 @@ const Dashboard = () => {
           </a>
         </div>
 
-        {/* Departments Count */}
         <div className="bg-yellow-500 text-white p-6 rounded-lg shadow-md text-center">
           <h3 className="text-3xl font-bold">{data.departmentCount}</h3>
           <p>Учурдагы семестрдa Сиз сабак берген бөлүм саны</p>

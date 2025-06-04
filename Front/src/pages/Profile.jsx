@@ -3,6 +3,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { BASE_URL } from "../config";
 
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
@@ -18,7 +19,7 @@ export default function ProfilePage() {
         return;
       }
       try {
-        const response = await api.get("https://40c8-178-217-174-2.ngrok-free.app/auth/profile", {
+        const response = await api.get(`${BASE_URL}/auth/profile`, {
           headers: { 
             Authorization: `Bearer ${token}`,
             "ngrok-skip-browser-warning": "69420"
@@ -27,7 +28,7 @@ export default function ProfilePage() {
 
         setProfile(response.data);
       } catch (err) {
-        setError("Failed to fetch profile.");
+        setError(err.response?.data?.message || "Failed to fetch profile");
       } finally {
         setLoading(false);
       }
@@ -42,7 +43,6 @@ export default function ProfilePage() {
   return (
     <div className="flex justify-center items-center bg-gray-100 p-25">
       <div className="w-full max-w-5x gap-6">
-        {/* Left Column - Profile Image */}
         <div className=" rounded-lg p-6 flex flex-col items-center">
           <img
             src={
@@ -57,7 +57,6 @@ export default function ProfilePage() {
           </h2>
         </div>
 
-        {/* Right Column - Profile Info */}
         <div className="bg-white shadow-md rounded-lg p-6 relative">
           <h1 className="text-3xl font-semibold mb-4 text-center">
             Personal Info
@@ -92,20 +91,6 @@ export default function ProfilePage() {
             </p>
             <p className="w-1/2">{profile.email}</p>
           </div>
-
-          {/* Lessons
-          <div className="mt-4 flex justify-center">
-            <h3 className="text-lg font-semibold">Lessons:</h3>
-            <ul className="list-disc pl-5">
-              {profile.lessons.length > 0 ? (
-                profile.lessons.map((lesson) => (
-                  <li key={lesson.id}>{lesson.name}</li>
-                ))
-              ) : (
-                <p className="text-gray-500">No lessons assigned</p>
-              )}
-            </ul>
-          </div> */}
         </div>
       </div>
     </div>

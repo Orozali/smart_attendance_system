@@ -5,6 +5,8 @@ import "react-toastify/dist/ReactToastify.css";
 import Cookies from "js-cookie";
 import api from "../../services/api";
 
+import { BASE_URL } from "../../config";
+
 export default function ChooseLesson() {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,7 +37,7 @@ export default function ChooseLesson() {
         return;
       }
       try {
-        const response = await axios.get("https://40c8-178-217-174-2.ngrok-free.app/lesson/all",
+        const response = await axios.get(`${BASE_URL}/lesson/all`,
           {
             headers: {
               "ngrok-skip-browser-warning": "69420"
@@ -74,7 +76,7 @@ export default function ChooseLesson() {
 
     try {
       const response = await api.post(
-        "https://40c8-178-217-174-2.ngrok-free.app/student/choose-lesson",
+        `${BASE_URL}/student/choose-lesson`,
         selectedLessons,
         {
           headers: {
@@ -92,7 +94,7 @@ export default function ChooseLesson() {
         setSelectedLessons([]);
       }
     } catch (err) {
-      console.error("Error:", err.response?.data); // Debugging
+      console.error("Error:", err.response?.data);
       showToast(err.response?.data?.detail || "Something went wrong!", "error");
     }
   };

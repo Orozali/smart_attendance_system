@@ -34,5 +34,5 @@ async def get_days(timetable_id: int, db: AsyncSession, current_user: User):
     if not db_attendance:
         return []
 
-    unique_dates = sorted({attendance.date for attendance in db_attendance}, reverse=True)
+    unique_dates = sorted({attendance.date for attendance in db_attendance})
     return unique_dates

@@ -1,16 +1,16 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { BASE_URL } from "../config";
 
-// Create an Axios instance with baseURL
 const api = axios.create({
-  baseURL: "http://localhost:8000", // Your API base URL
+  // baseURL: "http://localhost:8000", // Your API base URL
+  baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
 });
 
-// Function to get a new access token using the refresh token
 const refreshToken = async () => {
   const response = await axios.post(
-    "http://localhost:8000/auth/refresh-token",
+    `${BASE_URL}/auth/refresh-token`,
     {
       refresh_token: Cookies.get("refresh_token"),
     }
@@ -18,27 +18,23 @@ const refreshToken = async () => {
   return response.data.access_token;
 };
 
-// Axios interceptor to handle expired access token
 api.interceptors.response.use(
-  (response) => response, // If the response is successful, return it
+  (response) => response,
   async (error) => {
     console.log("error:", error);
     if (error.response && error.response.status === 401) {
-      // If the error is Unauthorized (token expired), try to refresh the token
       try {
         const newAccessToken = await refreshToken();
-        // Save the new access token in the cookie
         Cookies.set("access_token", newAccessToken, {
-          expires: 1 / 24, // 1 hour expiration time
+          expires: 1 / 24,
           secure: true,
           sameSite: "Strict",
         });
-        // Retry the original request with the new token
         error.config.headers["Authorization"] = `Bearer ${newAccessToken}`;
         return axios(error.config);
       } catch (refreshError) {
         console.error("Refresh token failed", refreshError);
-        // Redirect to login if refresh token fails
+        // Redirect to  if refresh token fails
         window.location.href = "/login";
       }
     }

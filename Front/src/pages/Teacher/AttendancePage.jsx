@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/api";
 import { toast, ToastContainer } from "react-toastify";
 
+import { BASE_URL } from "../../config";
+
 
 export default function AttendancePage() {
   const [students, setStudents] = useState([]);
@@ -40,14 +42,15 @@ export default function AttendancePage() {
       return;
     }
     try {
+      console.log("Fetching students for lessonId:", lessonId, "on day:", day);
       const url = day
-        ? `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}?day=${day.toISOString().split("T")[0]}`
-        : `https://40c8-178-217-174-2.ngrok-free.app/teacher/get-students-from-temporary-db/${lessonId}`;
+        ? `${BASE_URL}/teacher/get-students-from-temporary-db/${lessonId}?day=${day.toISOString().split("T")[0]}`
+        : `${BASE_URL}/teacher/get-students-from-temporary-db/${lessonId}`;
   
       const response = await api.get(url, {
         headers: { Authorization: `Bearer ${token}` },
+        Accept: 'application/json',
       });
-  
       setStudents(response.data.students);
       setLessonInfo(response.data.lesson_info);
       setTimetableId(response.data.students[0]?.timetable_id);
@@ -72,7 +75,7 @@ export default function AttendancePage() {
     }
 
     try {
-      const res = await api.get(`https://40c8-178-217-174-2.ngrok-free.app/attendance?timetable_id=${timetableId}`, {
+      const res = await api.get(`${BASE_URL}/attendance?timetable_id=${timetableId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(res) 
@@ -119,7 +122,7 @@ export default function AttendancePage() {
 
     try {
       const dateToUse = selectedDate ?? new Date();
-      await api.post("https://40c8-178-217-174-2.ngrok-free.app/teacher/attendance/save", {
+      await api.post(`${BASE_URL}/teacher/attendance/save`, {
         student_ids: selectedIds,
         manually_checked_ids: manuallyCheckedIds,
         timetable_id: timetableId,
@@ -131,7 +134,7 @@ export default function AttendancePage() {
       showToast("Attendance saved successfully!", "success");
       setTimeout(() => {
         window.location.reload();
-      }, 2000)
+      }, 1000000)
     } catch (err) {
       console.error(err);
       showToast(
@@ -160,7 +163,7 @@ export default function AttendancePage() {
     <div className="w-full p-6 bg-gray-100">
       <ToastContainer />
       <div>
-        <h2 className="text-gray-800">{lessonInfo?.code} {lessonInfo?.name}</h2>
+        <h2 className="text-gray-800 bg-gray-200 border border-gray-200 rounded mb-3">{lessonInfo?.code} {lessonInfo?.name}</h2>
       </div>
 
       <div className="flex justify-between">

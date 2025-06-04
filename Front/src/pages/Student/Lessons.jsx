@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import api from "../../services/api";
 
+import { BASE_URL } from "../../config";
+
 export default function StudentLessons() {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ export default function StudentLessons() {
 
       try {
         const response = await api.get(
-          "https://40c8-178-217-174-2.ngrok-free.app/student/my-lessons",
+          `${BASE_URL}/student/my-lessons`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

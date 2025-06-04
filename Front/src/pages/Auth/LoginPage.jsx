@@ -4,7 +4,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { Eye, EyeOff } from "lucide-react";
 
-// src/pages/LoginPage.jsx
+import { BASE_URL } from "../../config";
+
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,8 +34,7 @@ export default function LoginPage() {
     setErrors({});
     try {
       const response = await axios.post(
-        // "http://127.0.0.1:8000/auth/login",
-        "https://40c8-178-217-174-2.ngrok-free.app/auth/login",
+        `${BASE_URL}/auth/login`,
         { username: username, password: password },
         {
           headers: { "Content-Type": "application/json" },
@@ -110,7 +110,7 @@ export default function LoginPage() {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={loading} // Disable input while loading
+              disabled={loading}
             />
             <span
               onClick={show}
@@ -133,7 +133,7 @@ export default function LoginPage() {
           className={`w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 ${
             loading ? "bg-gray-400" : ""
           }`}
-          disabled={loading} // Disable button while loading
+          disabled={loading}
         >
           {loading ? (
             <div className="flex justify-center items-center">
