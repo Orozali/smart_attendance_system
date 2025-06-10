@@ -37,7 +37,7 @@ export default function LoginPage() {
         `${BASE_URL}/auth/login`,
         { username: username, password: password },
         {
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420"},
         }
       );
       const role = response.data.role;

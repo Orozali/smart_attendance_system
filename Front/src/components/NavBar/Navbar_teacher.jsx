@@ -17,6 +17,8 @@ export default function Navbar_teacher() {
   const [lessons, setLessons] = useState([]);
   const [isLessonsOpen, setIsLessonsOpen] = useState(false);
   const navigate = useNavigate();
+  const [selectedLessonId, setSelectedLessonId] = useState(null);
+
 
   useEffect(() => {
     const accessToken = Cookies.get("access_token");
@@ -41,6 +43,7 @@ export default function Navbar_teacher() {
   }, []);
 
   const handleLessonClick = (lessonId) => {
+    setSelectedLessonId(lessonId);
     navigate(`/lesson/${lessonId}`);
   };
 
@@ -100,20 +103,18 @@ export default function Navbar_teacher() {
           {isLessonsOpen && (
             <div className="mt-2 space-y-1">
               {lessons?.length > 0 ? (
-                lessons?.map((lesson) => (
+                lessons.map((lesson) => (
                   <div
                     key={lesson.id}
                     onClick={() => handleLessonClick(lesson.id)}
-                    className="flex items-center text-gray-100 px-4 py-2 hover:bg-gray-700 rounded cursor-pointer"
+                    className={`flex items-center text-gray-100 px-4 py-2 rounded cursor-pointer hover:bg-gray-700 ${
+                      selectedLessonId === lesson.id ? "bg-gray-700" : ""
+                    }`}
                   >
                     <NotepadText className="h-4 w-4 text-gray-400 mr-1.5" />
                     <div className="flex items-center gap-x-2 whitespace-nowrap">
-                      <span className="text-xs text-gray-400">
-                        {lesson.code}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {lesson.name}
-                      </span>
+                      <span className="text-xs text-gray-400">{lesson.code}</span>
+                      <span className="text-xs text-gray-400">{lesson.name}</span>
                     </div>
                   </div>
                 ))

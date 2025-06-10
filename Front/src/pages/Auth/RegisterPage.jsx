@@ -120,7 +120,7 @@ export default function RegisterPage() {
         `${BASE_URL}/auth/register`,
         formDataToSend,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { "Content-Type": "multipart/form-data","ngrok-skip-browser-warning": "69420"},
         }
       );
 

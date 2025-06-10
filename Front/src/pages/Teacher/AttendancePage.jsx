@@ -48,7 +48,7 @@ export default function AttendancePage() {
         : `${BASE_URL}/teacher/get-students-from-temporary-db/${lessonId}`;
   
       const response = await api.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "69420"},
         Accept: 'application/json',
       });
       setStudents(response.data.students);
@@ -134,7 +134,7 @@ export default function AttendancePage() {
       showToast("Attendance saved successfully!", "success");
       setTimeout(() => {
         window.location.reload();
-      }, 1000000)
+      }, 2000)
     } catch (err) {
       console.error(err);
       showToast(

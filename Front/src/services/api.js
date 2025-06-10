@@ -4,8 +4,8 @@ import { BASE_URL } from "../config";
 
 const api = axios.create({
   // baseURL: "http://localhost:8000", // Your API base URL
-  baseURL: BASE_URL,
-  headers: { "Content-Type": "application/json" },
+  baseURL: BASE_URL,     
+  headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "69420" },
 });
 
 const refreshToken = async () => {

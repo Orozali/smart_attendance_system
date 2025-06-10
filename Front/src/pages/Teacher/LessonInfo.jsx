@@ -39,6 +39,7 @@ export default function LessonInfo() {
       .get(`${BASE_URL}/teacher/get-lesson/${parsedId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+          "ngrok-skip-browser-warning": "69420",
           "Content-Type": "application/json",
         },
       })
@@ -88,11 +89,11 @@ export default function LessonInfo() {
   };
 
   return (
-    <div className="min-h-screen p-6 bg-gray-100 flex justify-center">
+    <div className="min-h-screen p-6 bg-gray-100 flex justify-center w-full">
       <ToastContainer />
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-screen-xl">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-xl font-semibold">Lesson Information</h1>
+          <h1 className="text-xl font-semibold">Сабак маалыматы</h1>
           <div className="flex space-x-2">
           {loading ? (
           <p className="text-center text-gray-500">Loading...</p>
@@ -120,7 +121,7 @@ export default function LessonInfo() {
                 <th className="border border-gray-300 p-2">Сабактын коду</th>
                 <th className="border border-gray-300 p-2">Семестр</th>
                 <th className="border border-gray-300 p-2">Студенттин саны</th>
-                <th className="border border-gray-300 p-2">Actions</th>
+                <th className="border border-gray-300 p-2">Сабактын аты</th>
               </tr>
             </thead>
             <tbody>
@@ -143,7 +144,8 @@ export default function LessonInfo() {
                   {lesson.countOfStudent}
                 </td>
                 <td className="border border-gray-300 p-2 space-y-2">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
+                  {lesson.name}
+                  {/* <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">
                     Көчүрүп алуу
                   </button>
                   <button className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition">
@@ -157,7 +159,7 @@ export default function LessonInfo() {
                   </button>
                   <button className="bg-indigo-500 text-white px-3 py-1 rounded hover:bg-indigo-600 transition">
                     Сабакка катышуу боюнча отчет
-                  </button>
+                  </button> */}
                 </td>
               </tr>
             </tbody>

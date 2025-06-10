@@ -24,7 +24,7 @@ export default function ReportPage() {
         const response = await api.get(
           url,
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${token}`, "ngrok-skip-browser-warning": "69420" },
           }
         );
         console.log(response.data)

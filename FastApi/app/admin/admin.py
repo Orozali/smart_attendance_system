@@ -150,7 +150,7 @@ class Timetable_timesAdmin(ModelView, model=Timetable_times):
 
 
 class Attendance_Admin(ModelView, model=Attendance):
-    column_list = [Attendance.id, Attendance.student, Attendance.percentage,Attendance.date, Attendance.timetable_id]
+    column_list = [Attendance.id, Attendance.student, Attendance.percentage,Attendance.attended, Attendance.date, Attendance.timetable_id]
 
 class TemporaryDbAdmin(ModelView, model=TemporaryAttendance):
     column_list = [TemporaryAttendance.id, TemporaryAttendance.student, TemporaryAttendance.entry_time, Attendance.timetable]

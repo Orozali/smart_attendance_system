@@ -56,13 +56,7 @@ export default function Navbar() {
             <Notebook className="w-4 h-4" />
             <span>Courses taken</span>
           </Link>
-          <Link
-            to="/all-lessons"
-            className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
-          >
-            <BookCheck className="w-4 h-4" />
-            <span> All subjects</span>
-          </Link>
+          
           <Link
             to="/choose-lesson"
             className="flex items-center space-x-2 px-4 py-2 text-gray-200 hover:bg-gray-700 rounded"
